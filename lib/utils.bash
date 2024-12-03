@@ -31,7 +31,6 @@ list_github_tags() {
 }
 
 list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
 	# Change this function if ripsecrets has other means of determining installable versions.
 	list_github_tags
 }
@@ -41,12 +40,45 @@ download_release() {
 	version="$1"
 	filename="$2"
 
-	# TODO: Adapt the release URL convention for ripsecrets
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/${version}/ripsecrets-${version}-$(get_release_nugget).tar.gz"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
+
+get_arch() {
+  uname -m | tr '[:upper:]' '[:lower:]'
+}
+
+get_platform() {
+  uname | tr '[:upper:]' '[:lower:]'
+}
+
+get_release_nugget() {
+  local nugget
+
+  case $(get_arch)-$(get_platform) in
+  arm64-darwin)
+    nugget='x86_64-apple-darwin' ;;
+  x86_64-darwin)
+    nugget='x86_64-apple-darwin' ;;
+  arm*-linux)
+    nugget='arm-unknown-linux-gnueabihf' ;;
+  x86_64-linux)
+    nugget='x86_64-unknown-linux-musl' ;;
+  i[3456]86-linux)
+    nugget='i686-unknown-linux-musl' ;;
+  x86_64-windows)
+    nugget='x86_64-pc-windows-msvc' ;;
+  i[3456]-windows)
+    nugget='i686-pc-windows-msvc' ;;
+  *)
+    nugget="$(get_arch)-$(get_platform)"
+  esac
+
+  echo "${nugget}"
+}
+
 
 install_version() {
 	local install_type="$1"
@@ -61,7 +93,6 @@ install_version() {
 		mkdir -p "$install_path"
 		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-		# TODO: Assert ripsecrets executable exists.
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
