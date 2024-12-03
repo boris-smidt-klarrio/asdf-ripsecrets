@@ -59,19 +59,13 @@ get_release_nugget() {
 
   case $(get_arch)-$(get_platform) in
   arm64-darwin)
-    nugget='x86_64-apple-darwin' ;;
+    nugget='aarch64-apple-darwin' ;;
   x86_64-darwin)
     nugget='x86_64-apple-darwin' ;;
   arm*-linux)
     nugget='arm-unknown-linux-gnueabihf' ;;
   x86_64-linux)
-    nugget='x86_64-unknown-linux-musl' ;;
-  i[3456]86-linux)
-    nugget='i686-unknown-linux-musl' ;;
-  x86_64-windows)
-    nugget='x86_64-pc-windows-msvc' ;;
-  i[3456]-windows)
-    nugget='i686-pc-windows-msvc' ;;
+    nugget='x86_64-unknown-linux-gnu' ;;
   *)
     nugget="$(get_arch)-$(get_platform)"
   esac
