@@ -42,7 +42,8 @@ download_release() {
 
 	url="$GH_REPO/releases/download/v${version}/ripsecrets-${version}-$(get_release_nugget).tar.gz"
 
-	echo "* Downloading $TOOL_NAME release $version..."
+	echo "* Downloading $TOOL_NAME release $version... to $filename"
+  mkdir -p "$(basename $filename)"
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
